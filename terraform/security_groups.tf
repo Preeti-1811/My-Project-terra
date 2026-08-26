@@ -1,5 +1,4 @@
-# ALB SECURITY GROUP
-
+# ALB SECURITY GROUP-----------------------------------------------------------------------
 
 resource "aws_security_group" "alb" {
   name        = "${var.project_name}-alb-sg"
@@ -18,7 +17,7 @@ resource "aws_security_group" "alb" {
     description = "Allow outbound traffic"
     from_port   = 0
     to_port     = 0
-    protocol    = "-1"
+    protocol    = "-1"            # all protocols ----------
     cidr_blocks = ["0.0.0.0/0"]
   }
 
@@ -28,7 +27,7 @@ resource "aws_security_group" "alb" {
 }
 
 
-# Frontend ECS Security Group
+# Frontend ECS Security Group--------------------------------------------------------
 
 
 resource "aws_security_group" "frontend" {
@@ -58,7 +57,7 @@ resource "aws_security_group" "frontend" {
 }
 
 
-# Backend ECS Security Group
+# Backend ECS Security Group ------------------------------------------------------------------
 
 resource "aws_security_group" "backend" {
   name        = "${var.project_name}-backend-sg"

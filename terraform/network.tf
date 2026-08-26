@@ -1,20 +1,20 @@
 # The actual infrastructure
 
-# VPC — your isolated network in AWS
+# VPC — your isolated network in AWS-------------------------------------------------
 resource "aws_vpc" "main" {
   cidr_block           = var.vpc_cidr
   enable_dns_support   = true
   enable_dns_hostnames = true
-  tags                 = { Name = "${var.project_name}-vpc" }
+  tags                 = { Name = "${var.project_name}-vpc" } 
 }
 
-# Internet Gateway — lets the VPC talk to the internet
+# Internet Gateway — lets the VPC talk to the internet------------------------------------
 resource "aws_internet_gateway" "igw" {
   vpc_id = aws_vpc.main.id
   tags   = { Name = "${var.project_name}-igw" }
 }
 
-# Public subnets — where the ALB will live
+# Public subnets — where the ALB will live --------------------------------------------
 resource "aws_subnet" "public" {
   count                   = length(var.public_subnet_cidrs)
   vpc_id                  = aws_vpc.main.id
@@ -24,7 +24,7 @@ resource "aws_subnet" "public" {
   tags                    = { Name = "${var.project_name}-public-${count.index}" }
 }
 
-# Private subnets — where ECS tasks will live
+# Private subnets — where ECS tasks will live -----------------------------------------------
 resource "aws_subnet" "private" {
   count             = length(var.private_subnet_cidrs)
   vpc_id            = aws_vpc.main.id
@@ -33,7 +33,7 @@ resource "aws_subnet" "private" {
   tags              = { Name = "${var.project_name}-private-${count.index}" }
 }
 
-# Elastic IP for the NAT Gateway
+# Elastic IP for the NAT Gateway---------------------------------------------------
 resource "aws_eip" "nat" {
   domain = "vpc"
   tags   = { Name = "${var.project_name}-nat-eip" }
@@ -51,7 +51,7 @@ resource "aws_nat_gateway" "nat" {
 resource "aws_route_table" "public" {
   vpc_id = aws_vpc.main.id
   route {
-    cidr_block = "0.0.0.0/0"
+    cidr_block = "0.0.0.0/0"      #Internet gateway-----------------------
     gateway_id = aws_internet_gateway.igw.id
   }
   tags = { Name = "${var.project_name}-public-rt" }
@@ -67,7 +67,7 @@ resource "aws_route_table_association" "public" {
 resource "aws_route_table" "private" {
   vpc_id = aws_vpc.main.id
   route {
-    cidr_block     = "0.0.0.0/0"
+    cidr_block     = "0.0.0.0/0"     #NAT gatway-----------------------------
     nat_gateway_id = aws_nat_gateway.nat.id
   }
   tags = { Name = "${var.project_name}-private-rt" }
